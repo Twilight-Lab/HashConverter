@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hash Converter</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d1a2f; /* Deep blue background */
+        }
+        .hash-card {
+            background-color: #1a2c42;
+            border-left: 4px solid #4a90e2; /* Blue accent bar */
+            transition: all 0.3s ease;
+        }
+        .hash-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        /* Fixed styling for the textareas */
+        textarea.hash-output {
+            background-color: #1a2c42; /* Use a dark background color */
+            color: #d1d5db; /* A light gray color for text */
+            width: 100%;
+            border-radius: 0.375rem;
+            padding: 0.75rem;
+            font-family: monospace;
+            font-size: 0.875rem;
+            resize: none;
+            outline: none;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4 text-white relative">
+
+    <div class="w-full max-w-2xl bg-gray-800 rounded-2xl shadow-2xl p-8 transform transition-transform scale-95 md:scale-100 relative">
+        <!-- Company Name inside the main box -->
+        <div class="absolute top-4 left-4 text-sm font-semibold">
+            <span class="text-blue-300">Twilight</span><span class="text-white">Lab</span>
+        </div>
+
+        <h1 class="text-3xl font-bold text-center text-blue-400 mt-8 mb-6">Hash Converter</h1>
+        <p class="text-center text-sm text-gray-400 mb-8">Enter your text below to generate MD5, SHA-1, and SHA-256 hashes in real-time.</p>
+
+        <!-- Input Area -->
+        <div class="mb-6">
+            <label for="text-input" class="block text-gray-300 font-semibold mb-2">Enter Text:</label>
+            <textarea id="text-input" rows="4" class="w-full p-4 bg-gray-700 text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors placeholder-gray-500 resize-none" placeholder="Type or paste your text here..."></textarea>
+        </div>
+
+        <!-- Output Cards -->
+        <div class="flex flex-col gap-6">
+            <!-- MD5 Card -->
+            <div class="hash-card rounded-lg p-5 shadow-lg relative">
+                <h2 class="text-lg font-semibold text-gray-200 mb-2">MD5</h2>
+                <div class="relative">
+                    <textarea id="md5-output" class="hash-output" readonly rows="2"></textarea>
+                    <button id="md5-copy-btn" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-400 transition-colors" aria-label="Copy MD5 hash to clipboard">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                    </button>
+                    <span id="md5-copied" class="absolute right-12 top-1/2 -translate-y-1/2 text-green-400 text-xs font-semibold opacity-0 transition-opacity duration-300">Copied!</span>
+                </div>
+            </div>
+
+            <!-- SHA-1 Card -->
+            <div class="hash-card rounded-lg p-5 shadow-lg relative">
+                <h2 class="text-lg font-semibold text-gray-200 mb-2">SHA-1</h2>
+                <div class="relative">
+                    <textarea id="sha1-output" class="hash-output" readonly rows="2"></textarea>
+                    <button id="sha1-copy-btn" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-400 transition-colors" aria-label="Copy SHA-1 hash to clipboard">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                    </button>
+                    <span id="sha1-copied" class="absolute right-12 top-1/2 -translate-y-1/2 text-green-400 text-xs font-semibold opacity-0 transition-opacity duration-300">Copied!</span>
+                </div>
+            </div>
+
+            <!-- SHA-256 Card -->
+            <div class="hash-card rounded-lg p-5 shadow-lg relative">
+                <h2 class="text-lg font-semibold text-gray-200 mb-2">SHA-256</h2>
+                <div class="relative">
+                    <textarea id="sha256-output" class="hash-output" readonly rows="3"></textarea>
+                    <button id="sha256-copy-btn" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-400 transition-colors" aria-label="Copy SHA-256 hash to clipboard">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                    </button>
+                    <span id="sha256-copied" class="absolute right-12 top-1/2 -translate-y-1/2 text-green-400 text-xs font-semibold opacity-0 transition-opacity duration-300">Copied!</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Copyright notice at the bottom center -->
+    <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-sm text-gray-400 font-light">
+        Copyright &copy; 2025 TwilightLab. All rights reserved.
+    </div>
+
+    <!-- Hashing Libraries from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Get elements from the DOM
+            const textInput = document.getElementById('text-input');
+            const md5Output = document.getElementById('md5-output');
+            const sha1Output = document.getElementById('sha1-output');
+            const sha256Output = document.getElementById('sha256-output');
+
+            // Get copy buttons and add event listeners
+            const md5CopyBtn = document.getElementById('md5-copy-btn');
+            const sha1CopyBtn = document.getElementById('sha1-copy-btn');
+            const sha256CopyBtn = document.getElementById('sha256-copy-btn');
+
+            md5CopyBtn.addEventListener('click', () => copyToClipboard('md5-output'));
+            sha1CopyBtn.addEventListener('click', () => copyToClipboard('sha1-output'));
+            sha256CopyBtn.addEventListener('click', () => copyToClipboard('sha256-output'));
+
+
+            // Listen for input changes to re-calculate hashes
+            textInput.addEventListener('input', () => {
+                const text = textInput.value;
+                updateHashes(text);
+            });
+
+            /**
+             * Updates all hash output fields based on the input text.
+             * @param {string} text - The input string to hash.
+             */
+            function updateHashes(text) {
+                md5Output.value = CryptoJS.MD5(text).toString();
+                sha1Output.value = CryptoJS.SHA1(text).toString();
+                sha256Output.value = CryptoJS.SHA256(text).toString();
+            }
+
+            /**
+             * Copies the text from a specified element to the clipboard.
+             * @param {string} elementId - The ID of the textarea element to copy from.
+             */
+            function copyToClipboard(elementId) {
+                const outputElement = document.getElementById(elementId);
+
+                // Use the fallback method directly, as the Clipboard API is being blocked by the browser.
+                fallbackCopy(outputElement);
+            }
+
+            /**
+             * Fallback function for copying text using the deprecated document.execCommand.
+             * @param {HTMLElement} outputElement - The textarea element to copy from.
+             */
+            function fallbackCopy(outputElement) {
+                outputElement.select();
+                document.execCommand('copy');
+                window.getSelection().removeAllRanges(); // Deselect text
+                showCopiedMessage(outputElement.id);
+            }
+
+            /**
+             * Shows a "Copied!" message for a brief period.
+             * @param {string} elementId - The ID of the output element that was copied.
+             */
+            function showCopiedMessage(elementId) {
+                const copiedMessage = document.getElementById(elementId.replace('-output', '-copied'));
+                copiedMessage.classList.remove('opacity-0');
+                copiedMessage.classList.add('opacity-100');
+                setTimeout(() => {
+                    copiedMessage.classList.remove('opacity-100');
+                    copiedMessage.classList.add('opacity-0');
+                }, 1500);
+            }
+        });
+    </script>
+</body>
+</html>

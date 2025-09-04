@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHA-256 Hash Converter</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d1a2d; /* Deep blue background */
+        }
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: #1a2b4a; /* Slightly lighter deep blue */
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        #message-box {
+            height: 150px;
+            color: #e2e8f0; /* Light text color */
+            background-color: #2a3d60; /* Darker input background */
+        }
+        #message-box::placeholder {
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body class="flex items-start justify-center min-h-screen text-gray-100 py-10">
+    <div class="container p-8">
+        <div class="mb-6">
+            <h2 class="text-2xl font-bold">
+                <span class="text-blue-400">Twilight</span>
+                <span class="text-gray-100">Lab</span>
+            </h2>
+        </div>
+        <h1 class="text-3xl font-bold mb-4 text-center text-gray-100">SHA-256 Hash Converter</h1>
+        <p class="text-gray-300 mb-6 text-center">Enter your text below to generate its SHA-256 hash. The algorithm is implemented entirely in JavaScript without any external libraries.</p>
+        
+        <div class="flex flex-col space-y-4">
+            <textarea id="message-box" class="w-full p-4 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-300" placeholder="Enter text to hash..."></textarea>
+            
+            <button id="hash-button" class="bg-blue-500 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:bg-blue-600 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50">
+                Generate Hash
+            </button>
+        </div>
+        
+        <div class="mt-8">
+            <div class="flex items-center justify-between mb-2">
+                <h2 class="text-2xl font-semibold text-gray-100">Result:</h2>
+                <button id="copy-button" class="bg-slate-800 text-gray-300 p-2 rounded-lg hover:bg-slate-700 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50" title="Copy to clipboard">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                </button>
+            </div>
+            <div id="hash-output-container" class="relative bg-slate-800 p-4 rounded-xl border border-slate-700 break-all overflow-hidden min-h-[4rem]">
+                <span id="hash-output" class="text-gray-200 font-mono text-sm sm:text-base"></span>
+            </div>
+            <div id="message-box-container" class="mt-4 hidden p-3 rounded-lg text-white font-semibold text-center transition-all duration-300"></div>
+        </div>
+
+        <!-- Copyright Text -->
+        <div class="mt-8 text-center text-xs text-gray-500">
+            Copyright &copy; 2025 Twilight Lab. All Rights Reserved.
+        </div>
+    </div>
+
+    <script>
+        // --- SHA-256 Algorithm Implementation ---
+        // This is a direct implementation of the SHA-256 algorithm in JavaScript.
+        // It does not use any external libraries or built-in functions for hashing.
+        
+        const S_0 = (x) => ((x >>> 2) | (x << 30)) ^ ((x >>> 13) | (x << 19)) ^ ((x >>> 22) | (x << 10));
+        const S_1 = (x) => ((x >>> 6) | (x << 26)) ^ ((x >>> 11) | (x << 21)) ^ ((x >>> 25) | (x << 7));
+        const s_0 = (x) => ((x >>> 7) | (x << 25)) ^ ((x >>> 18) | (x << 14)) ^ (x >>> 3);
+        const s_1 = (x) => ((x >>> 17) | (x << 15)) ^ ((x >>> 19) | (x << 13)) ^ (x >>> 10);
+        const Ch = (x, y, z) => (x & y) ^ (~x & z);
+        const Maj = (x, y, z) => (x & y) ^ (x & z) ^ (y & z);
+
+        const K = [
+            0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+            0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+            0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+            0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+            0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+            0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+            0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+            0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
+        ];
+
+        const H = [
+            0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
+            0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19
+        ];
+        
+        function sha256(message) {
+            // Convert message to array of bytes
+            const bytes = new TextEncoder().encode(message);
+            const len = bytes.length * 8;
+            
+            // Padding
+            const paddedBytes = [...bytes];
+            paddedBytes.push(0x80);
+            while ((paddedBytes.length * 8) % 512 !== 448) {
+                paddedBytes.push(0x00);
+            }
+            for (let i = 0; i < 8; i++) {
+                paddedBytes.push((len >>> (56 - i * 8)) & 0xFF);
+            }
+
+            // Process message in 512-bit chunks
+            let h = [...H];
+            for (let i = 0; i < paddedBytes.length; i += 64) {
+                const chunk = paddedBytes.slice(i, i + 64);
+                
+                // Prepare message schedule (W)
+                const W = new Uint32Array(64);
+                for (let t = 0; t < 16; t++) {
+                    W[t] = (chunk[t * 4] << 24) | (chunk[t * 4 + 1] << 16) | (chunk[t * 4 + 2] << 8) | chunk[t * 4 + 3];
+                }
+                for (let t = 16; t < 64; t++) {
+                    W[t] = (s_1(W[t - 2]) + W[t - 7] + s_0(W[t - 15]) + W[t - 16]) | 0;
+                }
+                
+                // Initialize working variables
+                let a = h[0], b = h[1], c = h[2], d = h[3], e = h[4], f = h[5], g = h[6], H = h[7];
+                
+                // Compression loop
+                for (let t = 0; t < 64; t++) {
+                    const T1 = (H + S_1(e) + Ch(e, f, g) + K[t] + W[t]) | 0;
+                    const T2 = (S_0(a) + Maj(a, b, c)) | 0;
+                    H = g;
+                    g = f;
+                    f = e;
+                    e = (d + T1) | 0;
+                    d = c;
+                    c = b;
+                    b = a;
+                    a = (T1 + T2) | 0;
+                }
+                
+                // Update hash values
+                h[0] = (h[0] + a) | 0;
+                h[1] = (h[1] + b) | 0;
+                h[2] = (h[2] + c) | 0;
+                h[3] = (h[3] + d) | 0;
+                h[4] = (h[4] + e) | 0;
+                h[5] = (h[5] + f) | 0;
+                h[6] = (h[6] + g) | 0;
+                h[7] = (h[7] + H) | 0;
+            }
+            
+            // Format output as hex string
+            let hexHash = '';
+            for (let i = 0; i < h.length; i++) {
+                let hex = (h[i] >>> 0).toString(16);
+                while (hex.length < 8) {
+                    hex = '0' + hex;
+                }
+                hexHash += hex;
+            }
+            
+            return hexHash;
+        }
+
+        // --- DOM Interaction and Event Handlers ---
+        const messageBox = document.getElementById('message-box');
+        const hashButton = document.getElementById('hash-button');
+        const hashOutput = document.getElementById('hash-output');
+        const copyButton = document.getElementById('copy-button');
+        const messageBoxContainer = document.getElementById('message-box-container');
+
+        hashButton.addEventListener('click', () => {
+            const message = messageBox.value;
+            if (message.length > 0) {
+                hashButton.disabled = true;
+                hashButton.textContent = 'Hashing...';
+                // Use a short timeout to allow the UI to update
+                setTimeout(() => {
+                    const hash = sha256(message);
+                    hashOutput.textContent = hash;
+                    hashButton.disabled = false;
+                    hashButton.textContent = 'Generate Hash';
+                }, 10);
+            } else {
+                hashOutput.textContent = '';
+                showMessage("Please enter some text.", "bg-red-500");
+            }
+        });
+
+        copyButton.addEventListener('click', () => {
+            const textToCopy = hashOutput.textContent;
+            if (textToCopy) {
+                // Create a temporary textarea element to hold the text to copy
+                const tempTextarea = document.createElement('textarea');
+                tempTextarea.value = textToCopy;
+                tempTextarea.style.position = 'fixed';
+                tempTextarea.style.opacity = '0';
+                document.body.appendChild(tempTextarea);
+                tempTextarea.focus();
+                tempTextarea.select();
+
+                try {
+                    const successful = document.execCommand('copy');
+                    if (successful) {
+                        showMessage("Hash copied to clipboard!", "bg-green-500");
+                    } else {
+                        throw new Error('Copy command failed.');
+                    }
+                } catch (err) {
+                    showMessage("Failed to copy. Please copy manually.", "bg-red-500");
+                    console.error('Could not copy text: ', err);
+                } finally {
+                    document.body.removeChild(tempTextarea);
+                }
+            } else {
+                showMessage("Nothing to copy.", "bg-red-500");
+            }
+        });
+
+        // Function to show a temporary message box
+        function showMessage(message, colorClass) {
+            messageBoxContainer.textContent = message;
+            messageBoxContainer.className = `mt-4 p-3 rounded-lg text-white font-semibold text-center transition-all duration-300 ${colorClass}`;
+            messageBoxContainer.classList.remove('hidden');
+            setTimeout(() => {
+                messageBoxContainer.classList.add('hidden');
+            }, 3000); // Hide after 3 seconds
+        }
+    </script>
+</body>
+</html>
